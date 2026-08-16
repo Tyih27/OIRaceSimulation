@@ -1,6 +1,6 @@
 import { createHash, randomUUID } from 'node:crypto';
 import { createReadStream } from 'node:fs';
-import { mkdir, readFile, rename, stat, writeFile, unlink } from 'node:fs/promises';
+import { mkdir, readFile, readdir, rename, stat, writeFile, unlink } from 'node:fs/promises';
 import { createServer } from 'node:http';
 import path from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
@@ -25,6 +25,16 @@ function httpError(status, message) {
 
 function saveFileName(playerName) {
   return `${createHash('sha256').update(playerName).digest('hex')}.json`;
+}
+
+function saveMetadata(save) {
+  return {
+    playerName: save.playerName,
+    savedAt: save.savedAt,
+    phase: save.phase,
+    level: save.state?.level ?? 0,
+    levelName: save.state?.levelName ?? '',
+  };
 }
 
 function queueWrite(filePath, operation) {
@@ -196,6 +206,34 @@ export function createAppServer({
       return true;
     }
 
+    if (url.pathname === '/api/saves') {
+      if (request.method !== 'GET') throw httpError(405, '不支持的请求方法');
+      let fileNames;
+      try {
+        fileNames = await readdir(savesDir);
+      } catch (error) {
+        if (error.code !== 'ENOENT') throw error;
+        fileNames = [];
+      }
+      const saves = (await Promise.all(fileNames
+        .filter((fileName) => fileName.endsWith('.json'))
+        .map(async (fileName) => {
+          try {
+            const save = await readJson(path.join(savesDir, fileName));
+            validateSaveEnvelope(save);
+            const normalizedName = normalizePlayerName(save.playerName);
+            if (fileName !== saveFileName(normalizedName)) return null;
+            return saveMetadata({ ...save, playerName: normalizedName });
+          } catch {
+            return null;
+          }
+        })))
+        .filter(Boolean)
+        .sort((left, right) => (Date.parse(right.savedAt) || 0) - (Date.parse(left.savedAt) || 0));
+      sendJson(response, 200, { saves });
+      return true;
+    }
+
     const saveMatch = url.pathname.match(/^\/api\/saves\/([^/]+)(\/meta)?$/);
     if (!saveMatch) return false;
     let rawName;
@@ -213,14 +251,7 @@ export function createAppServer({
       if (!save) {
         sendJson(response, 200, { exists: false });
       } else {
-        sendJson(response, 200, {
-          exists: true,
-          playerName: save.playerName,
-          savedAt: save.savedAt,
-          phase: save.phase,
-          level: save.state?.level ?? 0,
-          levelName: save.state?.levelName ?? '',
-        });
+        sendJson(response, 200, { exists: true, ...saveMetadata(save) });
       }
       return true;
     }

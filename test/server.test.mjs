@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { mkdtemp, readFile } from 'node:fs/promises';
+import { mkdtemp, readFile, writeFile } from 'node:fs/promises';
 import http from 'node:http';
 import os from 'node:os';
 import path from 'node:path';
@@ -80,6 +80,35 @@ test('存档 API 支持写入、元信息、读取和幂等删除', async () => 
     response = await requestJson(base, `/api/saves/${player}`, { method: 'DELETE' });
     assert.equal(response.status, 204);
     assert.equal((await requestJson(base, `/api/saves/${player}/meta`)).data.exists, false);
+  });
+});
+
+test('存档 API 列出所有有效存档并忽略损坏文件', async () => {
+  await withServer(async (base, dataDir) => {
+    let response = await requestJson(base, '/api/saves');
+    assert.deepEqual(response, { status: 200, data: { saves: [] } });
+
+    for (const playerName of ['甲', '乙']) {
+      response = await requestJson(base, `/api/saves/${encodeURIComponent(playerName)}`, {
+        method: 'PUT',
+        body: sampleSave(playerName),
+      });
+      assert.equal(response.status, 200);
+    }
+    await writeFile(path.join(dataDir, 'saves', 'broken.json'), '{not json', 'utf8');
+
+    response = await requestJson(base, '/api/saves');
+    assert.equal(response.status, 200);
+    assert.deepEqual(response.data.saves.map((save) => save.playerName).sort(), ['乙', '甲']);
+    for (const save of response.data.saves) {
+      assert.equal(typeof save.savedAt, 'string');
+      assert.equal(save.phase, 'active');
+      assert.equal(save.level, 2);
+      assert.equal(save.levelName, 'NOIP模拟赛1');
+    }
+
+    response = await requestJson(base, '/api/saves', { method: 'POST', body: {} });
+    assert.equal(response.status, 405);
   });
 });
 
