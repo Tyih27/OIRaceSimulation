@@ -277,6 +277,32 @@ canvas{display:block;max-width:100%;height:auto}
 .leaderboard-mini-scores .mini-score.fail{color:#b84c3b}
 .btn-export{background:#555;color:#fff;border:none;padding:6px 12px;border-radius:12px;font-weight:700;font-size:.7rem;cursor:pointer;margin-top:6px;transition:.2s}
 .btn-export:hover{background:#444}
+.btn-manual-save{display:block;width:100%;margin-top:10px;background:#fff;color:#333;border:2px solid #7b3fa3;padding:8px 12px;border-radius:14px;font-weight:700;font-size:.78rem;cursor:pointer;transition:.2s}
+.btn-manual-save:hover:not(:disabled){background:#f0e8f7;border-color:#5a2d82;transform:translateY(-1px)}
+.btn-manual-save:disabled{opacity:.5;cursor:not-allowed}
+.manual-save-modal{max-width:680px;text-align:left}
+.manual-save-modal h2{text-align:center}
+.manual-save-modal p,.manual-save-modal ol{font-size:.8rem;color:#444;line-height:1.7}
+.manual-save-path{display:block;background:#f5f5f5;border:1px dashed #bbb;border-radius:10px;padding:10px 12px;font-family:Consolas,Menlo,monospace;font-size:.78rem;color:#7b3fa3;word-break:break-all;margin:8px 0}
+.manual-save-textarea{width:100%;min-height:180px;resize:vertical;font-family:Consolas,Menlo,monospace;font-size:.72rem;line-height:1.4;padding:10px;border:1px solid #ccc;border-radius:10px;background:#fafafa;color:#222;box-sizing:border-box}
+.manual-save-actions{display:flex;justify-content:center;gap:12px;margin-top:12px;flex-wrap:wrap}
+.manual-save-actions button{background:#555;color:#fff;border:none;padding:10px 22px;border-radius:24px;font-weight:700;font-size:.85rem;cursor:pointer;transition:.2s}
+.manual-save-actions button:hover{background:#333}
+.manual-save-actions .btn-close-manual{background:#fff;color:#333;border:2px solid #ccc}
+.manual-save-actions .btn-close-manual:hover{background:#f0f0f0;border-color:#999}
+.offline-notice-modal{max-width:520px}
+.offline-notice-modal p{font-size:.82rem;color:#444;line-height:1.7;margin-bottom:8px}
+.import-save-modal{max-width:680px;text-align:left}
+.import-save-modal h2{text-align:center}
+.import-save-modal p{font-size:.8rem;color:#444;line-height:1.7}
+.import-save-textarea{width:100%;min-height:220px;resize:vertical;font-family:Consolas,Menlo,monospace;font-size:.72rem;line-height:1.4;padding:10px;border:1px solid #ccc;border-radius:10px;background:#fafafa;color:#222;box-sizing:border-box}
+.import-save-actions{display:flex;justify-content:center;gap:12px;margin-top:12px;flex-wrap:wrap}
+.import-save-actions button{background:#555;color:#fff;border:none;padding:10px 22px;border-radius:24px;font-weight:700;font-size:.85rem;cursor:pointer;transition:.2s}
+.import-save-actions button:hover{background:#333}
+.import-save-actions .btn-close-import{background:#fff;color:#333;border:2px solid #ccc}
+.import-save-actions .btn-close-import:hover{background:#f0f0f0;border-color:#999}
+.import-save-feedback{font-size:.78rem;font-weight:700;color:#a33;margin-top:10px;text-align:center;min-height:18px}
+.import-save-feedback.success{color:#2f6f3e}
 </style>
 </head>
 <body>
@@ -302,9 +328,10 @@ canvas{display:block;max-width:100%;height:auto}
 <div class="side-stock-row"><span class="side-stock-icon">💠</span><span class="side-stock-name">提升</span><span class="side-stock-count" id="sideBoostStock">0</span><div class="side-stock-bar"><div class="side-stock-fill boost-fill" id="sideBoostStockBar" style="width:0%"></div></div></div>
 <div class="side-stock-row"><span class="side-stock-icon">⚡</span><span class="side-stock-name">振奋</span><span class="side-stock-count" id="sideInspireStock">0</span><div class="side-stock-bar"><div class="side-stock-fill inspire-fill" id="sideInspireStockBar" style="width:0%"></div></div></div>
 </div>
+<button class="btn-manual-save hidden" id="btnManualSave" type="button">📋 手动保存</button>
 </div>
 </div>
-<div class="overlay start-overlay" id="nameInputOverlay"><div class="modal start-modal"><h2>OI 比赛模拟器</h2><p style="color:#888;font-size:.85rem;margin-bottom:12px">选择挑战，开始旅程</p><div class="service-status" id="serviceStatus">正在连接存档服务…</div><button class="btn-tutorial hidden" id="btnRetryService">重试连接</button><section class="save-list-section" aria-labelledby="saveListTitle"><div class="save-list-header"><h3 class="save-list-title" id="saveListTitle">👥 角色存档</h3><span class="save-list-count" id="saveListCount"></span></div><div class="save-list" id="saveList" role="list" aria-live="polite" aria-busy="true"><div class="save-list-state">正在读取存档…</div></div></section><input type="text" class="name-input" id="nameInput" aria-label="角色名称" placeholder="输入新角色名，或从上方选择" maxlength="16"><div class="name-error" id="nameError" aria-live="polite"></div><div class="save-meta" id="saveMeta"></div><button class="btn-tutorial" id="btnTutorial">开始教程</button><button class="btn-continue-save hidden" id="btnContinueGame">▶ 继续游戏</button><button class="btn-start-game" id="btnConfirmName" disabled>新游戏</button><button class="btn-challenge-open" id="btnOpenChallenge">挑战设置</button><div class="challenge-section"><div class="challenge-summary-row" id="challengeSummaryRow"></div></div></div></div>
+<div class="overlay start-overlay" id="nameInputOverlay"><div class="modal start-modal"><h2>OI 比赛模拟器</h2><p style="color:#888;font-size:.85rem;margin-bottom:12px">选择挑战，开始旅程</p><div class="service-status" id="serviceStatus">正在连接存档服务…</div><button class="btn-tutorial hidden" id="btnRetryService">重试连接</button><section class="save-list-section" aria-labelledby="saveListTitle"><div class="save-list-header"><h3 class="save-list-title" id="saveListTitle">👥 角色存档</h3><span class="save-list-count" id="saveListCount"></span></div><div class="save-list" id="saveList" role="list" aria-live="polite" aria-busy="true"><div class="save-list-state">正在读取存档…</div></div></section><input type="text" class="name-input" id="nameInput" aria-label="角色名称" placeholder="输入新角色名，或从上方选择" maxlength="16"><div class="name-error" id="nameError" aria-live="polite"></div><div class="save-meta" id="saveMeta"></div><button class="btn-tutorial" id="btnTutorial">开始教程</button><button class="btn-tutorial" id="btnImportSave">📥 导入存档</button><button class="btn-continue-save hidden" id="btnContinueGame">▶ 继续游戏</button><button class="btn-start-game" id="btnConfirmName" disabled>新游戏</button><button class="btn-challenge-open" id="btnOpenChallenge">挑战设置</button><div class="challenge-section"><div class="challenge-summary-row" id="challengeSummaryRow"></div></div></div></div>
 <div class="overlay challenge-overlay-bg hidden" id="challengeOverlay"><div class="modal"><h2>⚡挑战设置</h2><div class="challenge-warning">⚠️ 如果你还没有通关过游戏拿到IOI金牌，那么建议你先通关游戏</div><p style="color:#888;font-size:.8rem;margin-bottom:12px">点击挑战项切换</p>
 <div class="challenge-tier-group" id="tier1Group"><div class="challenge-tier-title">📋入门级</div><div class="challenge-tier-desc">简单的挑战，熟悉游戏之后可以尝试</div><div class="challenge-list" id="challengeListTier1">
 <div class="challenge-item" id="chI" data-ch="I"><div class="challenge-info"><div class="challenge-name">I级：时间不足</div><div class="challenge-desc">每在一道题获得100分 -k 时间（CSP-S/NOIP:k=1，省选/NOI:k=2，CTT及以后:k=3）</div></div><span class="challenge-status-badge off" id="badgeI">关闭</span></div>
@@ -347,11 +374,129 @@ canvas{display:block;max-width:100%;height:auto}
 </div></div>
 <div class="overlay hidden" id="gameOverOverlay"><div class="modal"><h2 id="modalTitle"></h2><p id="modalText"></p><div id="modalScoreSummary"></div><div id="modalChallengesUsed"></div><div id="modalHistory"></div><div id="modalButtons"><button class="btn btn-restart" id="btnModalRestart">🔄完全重置</button></div></div></div>
 <div class="overlay hidden" id="persistenceOverlay"><div class="modal persistence-modal"><h2>⚠️ 存档服务中断</h2><p id="persistenceError">当前进度尚未写入。游戏已暂停，请确认本地服务仍在运行后重试。</p><button class="btn-continue-save" id="btnRetrySave">重试保存</button></div></div>
+<div class="overlay hidden" id="offlineNoticeOverlay"><div class="modal offline-notice-modal"><h2>⚠️ 存档功能不可用</h2><p>当前为<strong>直接打开 index.html</strong> 或未启动存档服务的模式，可以正常游玩，但无法自动存档、读档和排行榜。</p><p>需要保存进度时，请在游戏中点击右侧面板的<strong>「📋 手动保存」</strong>，把存档内容放到项目的 <code>data/saves/</code> 文件夹中。之后用 <code>npm start</code> 启动即可继续游戏。</p><button class="btn-continue-save" id="btnCloseOfflineNotice">知道了</button></div></div>
+<div class="overlay hidden" id="manualSaveOverlay"><div class="modal manual-save-modal"><h2>📋 手动保存</h2><p>当前没有可用的存档服务，请手动把存档内容保存到下面的位置：</p><code class="manual-save-path" id="manualSavePath">data/saves/未命名.json</code><ol><li>点击「复制存档内容」按钮（或手动全选下方文本复制）。</li><li>打开项目目录中的 <code>data/saves/</code> 文件夹。</li><li>新建文件，文件名使用上方显示的完整文件名（包括 <code>.json</code>），粘贴并保存。</li><li>之后运行 <code>npm start</code>，即可在开始页看到并继续该存档。</li></ol><textarea id="manualSaveText" class="manual-save-textarea" readonly spellcheck="false" aria-label="手动保存的存档内容"></textarea><div class="manual-save-actions"><button type="button" id="btnCopyManualSave">📋 复制存档内容</button><button type="button" id="btnCloseManualSave" class="btn-close-manual">关闭</button></div></div></div>
+<div class="overlay hidden" id="importSaveOverlay"><div class="modal import-save-modal"><h2>📥 导入存档</h2><p>可以直接粘贴存档 JSON 内容，也可以选择 <code>.json</code> 文件导入。<br>使用 <code>npm start</code> 时导入会直接保存到本地；直接打开网页时仅作为本次临时存档。</p><textarea id="importSaveText" class="import-save-textarea" placeholder='请粘贴存档 JSON，或点击“选择文件”导入 .json 文件' spellcheck="false"></textarea><div class="import-save-actions"><button type="button" id="btnChooseImportFile">📂 选择文件</button><input type="file" id="importSaveFile" accept=".json,application/json" hidden><button type="button" id="btnConfirmImport">导入并开始</button><button type="button" id="btnCloseImportSave" class="btn-close-import">关闭</button></div><div id="importSaveFeedback" class="import-save-feedback" aria-live="polite"></div></div></div>
 <div class="challenge-tip-popup" id="challengeTipPopup"></div>
 <div id="discussionContainer" style="position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:200"></div>
-<script type="module">
-import { createSaveEnvelope, hydrateMaps, serializeMaps, validateSaveEnvelope } from './game-state.mjs';
+<script>
 (function(){
+const SAVE_SCHEMA_VERSION = 1;
+
+const NODE_TRANSIENT_KEYS = new Set(['children', 'parent', '_b', '_cb', '_shake']);
+const MAP_RELATION_KEYS = new Set(['nodeMap', 'root', 'correctResult', 'inferResults', 'inferReqs']);
+
+function copySerializable(source, excludedKeys) {
+  const result = {};
+  for (const [key, value] of Object.entries(source || {})) {
+    if (excludedKeys.has(key) || typeof value === 'function' || value === undefined) continue;
+    result[key] = value;
+  }
+  return result;
+}
+
+function serializeMaps(maps) {
+  return (maps || []).map((map) => ({
+    ...copySerializable(map, MAP_RELATION_KEYS),
+    rootId: map.root?.id ?? null,
+    correctResultId: map.correctResult?.id ?? null,
+    nodes: Object.values(map.nodeMap || {}).map((node) => ({
+      ...copySerializable(node, NODE_TRANSIENT_KEYS),
+      childIds: (node.children || []).map((child) => child.id),
+    })),
+    inferResults: [...(map.inferResults || new Map()).entries()],
+    inferReqs: [...(map.inferReqs || new Map()).entries()].map(([key, value]) => [
+      key,
+      value === Infinity ? { $number: 'Infinity' } : value,
+    ]),
+  }));
+}
+
+function hydrateMaps(serializedMaps) {
+  return (serializedMaps || []).map((savedMap) => {
+    const nodeMap = {};
+    for (const savedNode of savedMap.nodes || []) {
+      const { childIds: _childIds, ...nodeData } = savedNode;
+      nodeMap[savedNode.id] = {
+        ...nodeData,
+        children: [],
+        parent: null,
+        _b: null,
+        _cb: null,
+      };
+    }
+
+    for (const savedNode of savedMap.nodes || []) {
+      const node = nodeMap[savedNode.id];
+      for (const childId of savedNode.childIds || []) {
+        const child = nodeMap[childId];
+        if (!child) throw new Error(`存档引用了不存在的节点: ${childId}`);
+        node.children.push(child);
+        child.parent = node;
+      }
+    }
+
+    const {
+      nodes: _nodes,
+      rootId,
+      correctResultId,
+      inferResults = [],
+      inferReqs = [],
+      ...mapData
+    } = savedMap;
+    if (!nodeMap[rootId]) throw new Error(`存档根节点不存在: ${rootId}`);
+    if (!nodeMap[correctResultId]) throw new Error(`存档正确节点不存在: ${correctResultId}`);
+
+    return {
+      ...mapData,
+      nodeMap,
+      root: nodeMap[rootId],
+      correctResult: nodeMap[correctResultId],
+      inferResults: new Map(inferResults),
+      inferReqs: new Map(inferReqs.map(([key, value]) => [
+        key,
+        value && value.$number === 'Infinity' ? Infinity : value,
+      ])),
+    };
+  });
+}
+
+function createSaveEnvelope({ playerName, phase, state, finalScreen = null }) {
+  return {
+    schemaVersion: SAVE_SCHEMA_VERSION,
+    playerName,
+    savedAt: new Date().toISOString(),
+    phase,
+    state,
+    finalScreen,
+  };
+}
+
+function validateSaveEnvelope(value, expectedPlayerName = null) {
+  if (!value || typeof value !== 'object' || Array.isArray(value)) {
+    throw new Error('存档必须是 JSON 对象');
+  }
+  if (value.schemaVersion !== SAVE_SCHEMA_VERSION) {
+    throw new Error(`不支持的存档版本: ${value.schemaVersion}`);
+  }
+  if (typeof value.playerName !== 'string' || !value.playerName.trim()) {
+    throw new Error('存档缺少玩家名称');
+  }
+  if (expectedPlayerName !== null && value.playerName.normalize('NFC').trim() !== expectedPlayerName.normalize('NFC').trim()) {
+    throw new Error('存档玩家名称与请求不一致');
+  }
+  if (!['active', 'shop', 'finished'].includes(value.phase)) {
+    throw new Error(`无效的存档阶段: ${value.phase}`);
+  }
+  if (!value.state || typeof value.state !== 'object' || !Array.isArray(value.state.maps)) {
+    throw new Error('存档状态不完整');
+  }
+  if (value.phase === 'finished' && (!value.finalScreen || typeof value.finalScreen.title !== 'string')) {
+    throw new Error('终局存档缺少结果信息');
+  }
+  return value;
+}
+
 const LW=1200,LH=700,canvas=document.getElementById('treeCanvas'),ctx=canvas.getContext('2d');canvas.width=LW;canvas.height=LH;
 let sp=0,gm=4,maps=[],activeMapIdx=0,remTime=0,remStamina=0,maxStamina=20,maxStaminaActual=20,gameStarted=!1,level=0,totalHistScore=0,levelHistory=[],pendingNext=!1,playerName='',settling=!1;
 let timeStock=0,mindStock=0,boostStock=0,inspireStock=0;
@@ -366,28 +511,142 @@ let nodeAnimations={},spEarnedPending=0,timeToSpBonusPending=0,spEarnedAnim=null
 let settlingTimeout=null;
 let scoreRecordedForLevel=null;
 let currentPhase='start',finalScreenData=null,restoringSave=!1,saveBlocked=!1,serviceAvailable=!1;
+let offlineNoticeShown=!1;
 let saveTimer=null,saveDirty=!1,saveChain=Promise.resolve(),nameLookupTimer=null,lastSaveMeta=null,saveSummaries=[],saveListRequest=0;
 
 async function apiJson(url,options={}){const response=await fetch(url,{...options,headers:{'Content-Type':'application/json',...(options.headers||{})}});let data=null;const text=await response.text();if(text){try{data=JSON.parse(text)}catch{data=null}}if(!response.ok){const error=new Error(data?.message||('请求失败('+response.status+')'));error.status=response.status;throw error}return data}
 function captureGameState(){return{level,levelName:cfgL(level).name,sp,gm,maps:serializeMaps(maps),activeMapIdx,remTime,remStamina,maxStamina,maxStaminaActual,gameStarted,totalHistScore,levelHistory,pendingNext,timeStock,mindStock,boostStock,inspireStock,timeBonus,mindBonus,boostLevel,inspireCount,moneyPowerUsed,focusStacks,focusMapIdx,pendingFoodEffects,activeFoodTimeBonus,activeFoodMindBonus,ch,inferMode,shop,spEarnedPending,timeToSpBonusPending,initialTotalTime,scoreRecordedForLevel}}
 function makeCurrentSave(){return createSaveEnvelope({playerName,phase:currentPhase,state:captureGameState(),finalScreen:finalScreenData})}
+function sha256Hex(str) {
+  const bytes = new TextEncoder().encode(str);
+  const bitLength = bytes.length * 8;
+  const padding = [];
+  padding.push(0x80);
+  while ((bytes.length + padding.length) % 64 !== 56) padding.push(0);
+  const data = new Uint8Array(bytes.length + padding.length + 8);
+  data.set(bytes);
+  data.set(padding, bytes.length);
+  const dv = new DataView(data.buffer);
+  dv.setUint32(data.length - 8, Math.floor(bitLength / 0x100000000));
+  dv.setUint32(data.length - 4, bitLength >>> 0);
+  const K = [
+    0x428a2f98,0x71374491,0xb5c0fbcf,0xe9b5dba5,0x3956c25b,0x59f111f1,0x923f82a4,0xab1c5ed5,
+    0xd807aa98,0x12835b01,0x243185be,0x550c7dc3,0x72be5d74,0x80deb1fe,0x9bdc06a7,0xc19bf174,
+    0xe49b69c1,0xefbe4786,0x0fc19dc6,0x240ca1cc,0x2de92c6f,0x4a7484aa,0x5cb0a9dc,0x76f988da,
+    0x983e5152,0xa831c66d,0xb00327c8,0xbf597fc7,0xc6e00bf3,0xd5a79147,0x06ca6351,0x14292967,
+    0x27b70a85,0x2e1b2138,0x4d2c6dfc,0x53380d13,0x650a7354,0x766a0abb,0x81c2c92e,0x92722c85,
+    0xa2bfe8a1,0xa81a664b,0xc24b8b70,0xc76c51a3,0xd192e819,0xd6990624,0xf40e3585,0x106aa070,
+    0x19a4c116,0x1e376c08,0x2748774c,0x34b0bcb5,0x391c0cb3,0x4ed8aa4a,0x5b9cca4f,0x682e6ff3,
+    0x748f82ee,0x78a5636f,0x84c87814,0x8cc70208,0x90befffa,0xa4506ceb,0xbef9a3f7,0xc67178f2
+  ];
+  const H = [
+    0x6a09e667,0xbb67ae85,0x3c6ef372,0xa54ff53a,0x510e527f,0x9b05688c,0x1f83d9ab,0x5be0cd19
+  ];
+  const rotr = (x, n) => (x >>> n) | (x << (32 - n));
+  const w = new Array(64);
+  for (let block = 0; block < data.length; block += 64) {
+    for (let i = 0; i < 16; i++) w[i] = dv.getUint32(block + i * 4);
+    for (let i = 16; i < 64; i++) {
+      const s0 = rotr(w[i - 15], 7) ^ rotr(w[i - 15], 18) ^ (w[i - 15] >>> 3);
+      const s1 = rotr(w[i - 2], 17) ^ rotr(w[i - 2], 19) ^ (w[i - 2] >>> 10);
+      w[i] = (w[i - 16] + s0 + w[i - 7] + s1) | 0;
+    }
+    let a = H[0], b = H[1], c = H[2], d = H[3], e = H[4], f = H[5], g = H[6], h = H[7];
+    for (let i = 0; i < 64; i++) {
+      const S1 = rotr(e, 6) ^ rotr(e, 11) ^ rotr(e, 25);
+      const ch = (e & f) ^ ((~e) & g);
+      const temp1 = (h + S1 + ch + K[i] + w[i]) | 0;
+      const S0 = rotr(a, 2) ^ rotr(a, 13) ^ rotr(a, 22);
+      const maj = (a & b) ^ (a & c) ^ (b & c);
+      const temp2 = (S0 + maj) | 0;
+      h = g; g = f; f = e; e = (d + temp1) | 0; d = c; c = b; b = a; a = (temp1 + temp2) | 0;
+    }
+    H[0] = (H[0] + a) | 0; H[1] = (H[1] + b) | 0; H[2] = (H[2] + c) | 0; H[3] = (H[3] + d) | 0;
+    H[4] = (H[4] + e) | 0; H[5] = (H[5] + f) | 0; H[6] = (H[6] + g) | 0; H[7] = (H[7] + h) | 0;
+  }
+  return H.map(x => (x >>> 0).toString(16).padStart(8, '0')).join('');
+}
+function manualSaveFileName(){return sha256Hex(playerName.normalize('NFC').trim())+'.json'}
+function updateManualSaveButton(){const btn=document.getElementById('btnManualSave');if(!btn)return;btn.classList.toggle('hidden',!( !serviceAvailable && playerName && currentPhase!=='start' ))}
+function showOfflineNotice(){document.getElementById('offlineNoticeOverlay').classList.remove('hidden')}
+function openManualSave(){
+  if(!playerName||currentPhase==='start'){setGM('进入游戏后才能手动保存','warning');return}
+  const saveText=JSON.stringify(makeCurrentSave(),null,2);
+  const file=manualSaveFileName();
+  document.getElementById('manualSavePath').textContent='data/saves/'+file;
+  document.getElementById('manualSaveText').value=saveText;
+  document.getElementById('manualSaveOverlay').classList.remove('hidden');
+}
+async function copyManualSave(){
+  const btn=document.getElementById('btnCopyManualSave');
+  const oldText=btn.textContent;
+  const text=document.getElementById('manualSaveText').value;
+  const markCopied=()=>{btn.textContent='✅ 已复制';setTimeout(()=>{btn.textContent=oldText},2000)};
+  try{
+    if(navigator.clipboard?.writeText){await navigator.clipboard.writeText(text);markCopied();return}
+    throw new Error('no-clipboard');
+  }catch(error){
+    const ta=document.getElementById('manualSaveText');
+    ta.focus();ta.select();ta.setSelectionRange(0,ta.value.length);
+    let copied=!1;
+    try{copied=document.execCommand('copy')}catch(e){copied=!1}
+    if(copied)markCopied();
+    else setGM('⚠️自动复制失败，请手动全选下方文本后复制','warning');
+  }
+}
+function setImportFeedback(message,isOk=!1){const el=document.getElementById('importSaveFeedback');if(!el)return;el.textContent=message;el.className='import-save-feedback'+(isOk?' success':'');}
+function openImportSaveOverlay(){const el=document.getElementById('importSaveText');if(el)el.value='';setImportFeedback('');document.getElementById('importSaveOverlay').classList.remove('hidden')}
+function handleImportFile(file){
+  const reader=new FileReader();
+  reader.onload=()=>{const el=document.getElementById('importSaveText');if(el)el.value=String(reader.result||'');setImportFeedback('已读取文件，请点击“导入并开始”')};
+  reader.onerror=()=>{setImportFeedback('读取文件失败')};
+  reader.readAsText(file);
+}
+async function importSaveFromText(text){
+  const feedback=document.getElementById('importSaveFeedback');
+  let save;
+  try{save=JSON.parse(text)}catch(error){setImportFeedback('JSON 格式错误：'+error.message);return}
+  try{
+    if(save&&typeof save.playerName==='string')save.playerName=save.playerName.normalize('NFC').trim();
+    validateSaveEnvelope(save);
+  }catch(error){setImportFeedback('存档无效：'+error.message);return}
+  const btn=document.getElementById('btnConfirmImport'),oldText=btn.textContent;
+  btn.disabled=!0;btn.textContent='导入中…';
+  try{
+    if(serviceAvailable){
+      await apiJson('/api/saves/'+encodeURIComponent(save.playerName),{method:'PUT',body:JSON.stringify(save)});
+    }
+    await restoreSave(save);
+    document.getElementById('importSaveOverlay').classList.add('hidden');
+    if(serviceAvailable){
+      refreshSaveList();refreshSaveMeta();
+      setGM('✅存档已导入并保存到本地','success');
+    }else{
+      setGM('已临时导入存档：'+save.playerName+'（仅当前网页有效）','info');
+    }
+  }catch(error){
+    setImportFeedback('导入失败：'+error.message);
+  }finally{
+    btn.disabled=!1;btn.textContent=oldText;
+  }
+}
 function applyGameState(state){level=state.level;sp=state.sp;gm=state.gm;maps=hydrateMaps(state.maps);activeMapIdx=state.activeMapIdx;remTime=state.remTime;remStamina=state.remStamina;maxStamina=state.maxStamina;maxStaminaActual=state.maxStaminaActual;gameStarted=state.gameStarted;totalHistScore=state.totalHistScore;levelHistory=state.levelHistory||[];pendingNext=state.pendingNext;timeStock=state.timeStock;mindStock=state.mindStock;boostStock=state.boostStock;inspireStock=state.inspireStock;timeBonus=state.timeBonus;mindBonus=state.mindBonus;boostLevel=state.boostLevel;inspireCount=state.inspireCount;moneyPowerUsed=state.moneyPowerUsed;focusStacks=state.focusStacks;focusMapIdx=state.focusMapIdx;pendingFoodEffects=state.pendingFoodEffects||[];activeFoodTimeBonus=state.activeFoodTimeBonus;activeFoodMindBonus=state.activeFoodMindBonus;ch={...ch,...state.ch};inferMode=state.inferMode;shop={...shop,...state.shop};spEarnedPending=state.spEarnedPending||0;timeToSpBonusPending=state.timeToSpBonusPending||0;initialTotalTime=state.initialTotalTime||0;scoreRecordedForLevel=state.scoreRecordedForLevel??null;settling=!1;nodeAnimations={};forceResetSettling()}
-async function putCurrentSave(options={}){if(!playerName||currentPhase==='start')return;const save=makeCurrentSave();await apiJson('/api/saves/'+encodeURIComponent(playerName),{method:'PUT',body:JSON.stringify(save),keepalive:!!options.keepalive})}
+async function putCurrentSave(options={}){if(!serviceAvailable||!playerName||currentPhase==='start')return;const save=makeCurrentSave();await apiJson('/api/saves/'+encodeURIComponent(playerName),{method:'PUT',body:JSON.stringify(save),keepalive:!!options.keepalive})}
 function handlePersistenceFailure(error){saveBlocked=!0;stopChTimer();document.getElementById('persistenceError').textContent='当前进度尚未写入：'+error.message+'。游戏已暂停，请确认本地服务仍在运行后重试。';document.getElementById('persistenceOverlay').classList.remove('hidden')}
-function flushAutoSave(){if(saveTimer){clearTimeout(saveTimer);saveTimer=null}if(!saveDirty||!playerName||currentPhase==='start'||restoringSave)return saveChain;saveDirty=!1;saveChain=saveChain.catch(()=>{}).then(()=>putCurrentSave()).then(()=>{if(saveDirty)flushAutoSave()}).catch(error=>{saveDirty=!0;handlePersistenceFailure(error);throw error});return saveChain}
+function flushAutoSave(){if(saveTimer){clearTimeout(saveTimer);saveTimer=null}if(!serviceAvailable||!saveDirty||!playerName||currentPhase==='start'||restoringSave)return saveChain;saveDirty=!1;saveChain=saveChain.catch(()=>{}).then(()=>putCurrentSave()).then(()=>{if(saveDirty)flushAutoSave()}).catch(error=>{saveDirty=!0;handlePersistenceFailure(error);throw error});return saveChain}
 function queueAutoSave(immediate=!1){if(restoringSave||!playerName||currentPhase==='start')return;saveDirty=!0;if(saveTimer)clearTimeout(saveTimer);saveTimer=setTimeout(()=>{flushAutoSave().catch(()=>{})},immediate?0:120)}
-async function submitCurrentScore(){if(!playerName||scoreRecordedForLevel===null)return;const histEntry=levelHistory.find(e=>e.level===scoreRecordedForLevel);if(!histEntry)return;await apiJson('/api/leaderboard/records',{method:'POST',body:JSON.stringify({playerName,level:scoreRecordedForLevel,cumulativeScore:totalHistScore,matchScore:{level:scoreRecordedForLevel,name:histEntry.name,matchScore:histEntry.totalScore,passed:histEntry.passed,sim:histEntry.sim}})})}
+async function submitCurrentScore(){if(!serviceAvailable||!playerName||scoreRecordedForLevel===null)return;const histEntry=levelHistory.find(e=>e.level===scoreRecordedForLevel);if(!histEntry)return;await apiJson('/api/leaderboard/records',{method:'POST',body:JSON.stringify({playerName,level:scoreRecordedForLevel,cumulativeScore:totalHistScore,matchScore:{level:scoreRecordedForLevel,name:histEntry.name,matchScore:histEntry.totalScore,passed:histEntry.passed,sim:histEntry.sim}})})}
 async function retryPersistence(){const btn=document.getElementById('btnRetrySave');btn.disabled=!0;btn.textContent='正在重试…';try{await apiJson('/api/health');await submitCurrentScore();saveDirty=!0;await flushAutoSave();saveBlocked=!1;document.getElementById('persistenceOverlay').classList.add('hidden');if(currentPhase==='active')startChTimer();setGM('✅存档服务已恢复','success')}catch(error){document.getElementById('persistenceError').textContent='仍无法保存：'+error.message+'。请检查服务后再次重试。'}finally{btn.disabled=!1;btn.textContent='重试保存'}}
-async function restoreSave(save){validateSaveEnvelope(save,save.playerName);restoringSave=!0;stopChTimer();playerName=save.playerName;currentPhase=save.phase;finalScreenData=save.finalScreen;applyGameState(save.state);document.getElementById('nameInputOverlay').classList.add('hidden');document.getElementById('challengeOverlay').classList.add('hidden');document.getElementById('shopOverlay').classList.add('hidden');document.getElementById('gameOverOverlay').classList.add('hidden');syncChUI();updateUI();updateMapSelectorBtns();refreshUI();updateSideStocks();updateActBar();if(inferMode)document.getElementById('canvasWrapper').classList.add('inference');else document.getElementById('canvasWrapper').classList.remove('inference');if(currentPhase==='shop'){showShopOverlay(()=>{forceResetSettling();proceedNext()},{restoring:!0})}else if(currentPhase==='finished'){showFinal(finalScreenData?.title||'比赛结束',finalScreenData?.text||'',{restoring:!0})}else{gameStarted=!0;startChTimer()}restoringSave=!1;saveDirty=!1}
+async function restoreSave(save){validateSaveEnvelope(save,save.playerName);restoringSave=!0;stopChTimer();playerName=save.playerName;currentPhase=save.phase;finalScreenData=save.finalScreen;applyGameState(save.state);document.getElementById('nameInputOverlay').classList.add('hidden');document.getElementById('challengeOverlay').classList.add('hidden');document.getElementById('shopOverlay').classList.add('hidden');document.getElementById('gameOverOverlay').classList.add('hidden');syncChUI();updateUI();updateMapSelectorBtns();refreshUI();updateSideStocks();updateActBar();if(inferMode)document.getElementById('canvasWrapper').classList.add('inference');else document.getElementById('canvasWrapper').classList.remove('inference');if(currentPhase==='shop'){showShopOverlay(()=>{forceResetSettling();proceedNext()},{restoring:!0})}else if(currentPhase==='finished'){showFinal(finalScreenData?.title||'比赛结束',finalScreenData?.text||'',{restoring:!0})}else{gameStarted=!0;startChTimer()}restoringSave=!1;saveDirty=!1;updateManualSaveButton()}
 async function migrateLegacyLeaderboard(){if(localStorage.getItem('oi_leaderboard_migrated_v1')==='1')return;const raw=localStorage.getItem('oi_leaderboard');if(!raw){localStorage.setItem('oi_leaderboard_migrated_v1','1');return}try{const data=JSON.parse(raw);await apiJson('/api/leaderboard/import',{method:'POST',body:JSON.stringify(data)});localStorage.setItem('oi_leaderboard_migrated_v1','1')}catch(error){console.warn('旧排行榜迁移失败',error)}}
 function setSaveListState(message,isError=!1){const list=document.getElementById('saveList'),state=document.createElement('div');state.className='save-list-state'+(isError?' error':'');state.textContent=message;list.replaceChildren(state);list.setAttribute('aria-busy','false');document.getElementById('saveListCount').textContent=''}
 function formatSaveTime(value){const date=new Date(value);return Number.isNaN(date.getTime())?'保存时间未知':date.toLocaleString()}
 function describeSave(save){const levelName=save.levelName||('第'+(Number(save.level||0)+1)+'关');if(save.phase==='finished')return '已完成 · '+levelName;if(save.phase==='shop')return '商店阶段 · '+levelName;return '进行中 · '+levelName}
 function renderSaveList(){const list=document.getElementById('saveList'),count=document.getElementById('saveListCount');list.setAttribute('aria-busy','false');count.textContent=saveSummaries.length+' 个存档';if(saveSummaries.length===0){setSaveListState('还没有角色存档，输入名称开始新游戏吧');count.textContent='0 个存档';return}const selected=document.getElementById('nameInput').value.normalize('NFC').trim();const cards=saveSummaries.map(save=>{const card=document.createElement('article');card.className='save-card'+(save.playerName===selected?' selected':'');card.setAttribute('role','listitem');const icon=document.createElement('span');icon.className='save-card-icon';icon.setAttribute('aria-hidden','true');icon.textContent='👤';const info=document.createElement('div');info.className='save-card-info';const name=document.createElement('div');name.className='save-card-name';name.textContent=save.playerName;const meta=document.createElement('div');meta.className='save-card-meta';meta.textContent=describeSave(save)+' · '+formatSaveTime(save.savedAt);info.append(name,meta);const actions=document.createElement('div');actions.className='save-card-actions';const continueBtn=document.createElement('button');continueBtn.type='button';continueBtn.className='save-card-btn continue';continueBtn.textContent='继续';continueBtn.setAttribute('aria-label','继续角色 '+save.playerName);continueBtn.addEventListener('click',()=>continueSave(save.playerName,continueBtn));const deleteBtn=document.createElement('button');deleteBtn.type='button';deleteBtn.className='save-card-btn delete';deleteBtn.textContent='删除';deleteBtn.setAttribute('aria-label','删除角色 '+save.playerName+' 的存档');deleteBtn.addEventListener('click',()=>deleteListedSave(save.playerName,deleteBtn));actions.append(continueBtn,deleteBtn);card.append(icon,info,actions);return card});list.replaceChildren(...cards)}
-async function refreshSaveList(){const request=++saveListRequest;if(!serviceAvailable){saveSummaries=[];setSaveListState('连接存档服务后将在这里显示角色');return}setSaveListState('正在读取存档…');document.getElementById('saveList').setAttribute('aria-busy','true');try{const data=await apiJson('/api/saves');if(request!==saveListRequest)return;saveSummaries=Array.isArray(data?.saves)?data.saves:[];renderSaveList()}catch(error){if(request!==saveListRequest)return;saveSummaries=[];setSaveListState('读取存档列表失败：'+error.message,!0)}}
+async function refreshSaveList(){const request=++saveListRequest;if(!serviceAvailable){saveSummaries=[];setSaveListState('存档服务不可用：可游玩，但无法读取已有存档',!0);return}setSaveListState('正在读取存档…');document.getElementById('saveList').setAttribute('aria-busy','true');try{const data=await apiJson('/api/saves');if(request!==saveListRequest)return;saveSummaries=Array.isArray(data?.saves)?data.saves:[];renderSaveList()}catch(error){if(request!==saveListRequest)return;saveSummaries=[];setSaveListState('读取存档列表失败：'+error.message,!0)}}
 async function continueSave(name,button){const input=document.getElementById('nameInput'),errorEl=document.getElementById('nameError'),oldText=button?.textContent;input.value=name;errorEl.textContent='';renderSaveList();if(button){button.disabled=!0;button.textContent='读取中…'}try{const save=await apiJson('/api/saves/'+encodeURIComponent(name));await restoreSave(save)}catch(error){errorEl.textContent='读取存档失败：'+error.message}finally{if(button){button.disabled=!1;button.textContent=oldText}}}
-async function deleteListedSave(name,button){if(!confirm('确定删除“'+name+'”的存档吗？此操作不可撤销。'))return;const input=document.getElementById('nameInput'),errorEl=document.getElementById('nameError'),oldText=button.textContent;button.disabled=!0;button.textContent='删除中…';try{await apiJson('/api/saves/'+encodeURIComponent(name),{method:'DELETE'});if(input.value.normalize('NFC').trim()===name){input.value='';lastSaveMeta=null}if(playerName===name)playerName='';errorEl.textContent='';await Promise.all([refreshSaveList(),refreshSaveMeta()])}catch(error){errorEl.textContent='删除存档失败：'+error.message;button.disabled=!1;button.textContent=oldText}}
-async function checkService(){const status=document.getElementById('serviceStatus'),retry=document.getElementById('btnRetryService');retry.disabled=!0;try{await apiJson('/api/health');serviceAvailable=!0;status.textContent='✅ 存档服务已连接';status.classList.remove('error');retry.classList.add('hidden');document.getElementById('btnConfirmName').disabled=!1;await migrateLegacyLeaderboard();await Promise.all([refreshSaveMeta(),refreshSaveList()])}catch(error){serviceAvailable=!1;status.textContent='❌ 存档服务不可用，请通过 npm start 启动游戏';status.classList.add('error');retry.classList.remove('hidden');document.getElementById('btnConfirmName').disabled=!0;document.getElementById('btnContinueGame').classList.add('hidden');saveSummaries=[];setSaveListState('存档服务不可用',!0)}finally{retry.disabled=!1}}
+async function deleteListedSave(name,button){if(!confirm('确定删除“'+name+'”的存档吗？此操作不可撤销。'))return;const input=document.getElementById('nameInput'),errorEl=document.getElementById('nameError'),oldText=button.textContent;button.disabled=!0;button.textContent='删除中…';try{await apiJson('/api/saves/'+encodeURIComponent(name),{method:'DELETE'});if(input.value.normalize('NFC').trim()===name){input.value='';lastSaveMeta=null}if(playerName===name)playerName='';updateManualSaveButton();errorEl.textContent='';await Promise.all([refreshSaveList(),refreshSaveMeta()])}catch(error){errorEl.textContent='删除存档失败：'+error.message;button.disabled=!1;button.textContent=oldText}}
+async function checkService(){const status=document.getElementById('serviceStatus'),retry=document.getElementById('btnRetryService');retry.disabled=!0;try{await apiJson('/api/health');serviceAvailable=!0;status.textContent='✅ 存档服务已连接';status.classList.remove('error');retry.classList.add('hidden');document.getElementById('btnConfirmName').disabled=!1;updateManualSaveButton();await migrateLegacyLeaderboard();await Promise.all([refreshSaveMeta(),refreshSaveList()])}catch(error){serviceAvailable=!1;status.textContent='❌ 存档功能不可用（直接打开或未启动 npm start）。可正常游玩，但无法自动存档/读档/排行榜';status.classList.add('error');retry.classList.remove('hidden');document.getElementById('btnConfirmName').disabled=!1;document.getElementById('btnContinueGame').classList.add('hidden');saveSummaries=[];setSaveListState('存档服务不可用，可继续游玩，但无法读档',!0);updateManualSaveButton();if(!offlineNoticeShown){offlineNoticeShown=!0;showOfflineNotice()}}finally{retry.disabled=!1}}
 const LV=[{name:'CSP-S模拟赛',maps:4,pass:200,stam:35,sim:!0},{name:'CSP-S',maps:4,pass:200,stam:35,sim:!1},{name:'NOIP模拟赛1',maps:4,pass:200,stam:35,sim:!0},{name:'NOIP模拟赛2',maps:4,pass:200,stam:35,sim:!0},{name:'NOIP',maps:4,pass:200,stam:35,sim:!1},{name:'省选模拟赛1',maps:6,pass:400,stam:45,sim:!0},{name:'省选模拟赛2',maps:6,pass:400,stam:45,sim:!0},{name:'省选',maps:6,pass:400,stam:45,sim:!1},{name:'NOI模拟赛1',maps:6,pass:400,stam:45,sim:!0},{name:'NOI模拟赛2',maps:6,pass:400,stam:45,sim:!0},{name:'NOI',maps:6,pass:400,stam:45,sim:!1},{name:'CTT',maps:6,pass:400,stam:45,sim:!1},{name:'CTS',maps:6,pass:400,stam:45,sim:!1},{name:'IOI',maps:6,pass:0,stam:45,sim:!1}];
 function cfgL(l){return LV[Math.min(l,LV.length-1)]}
 function getMapGenParams(lv,mapIdx){const mapsCount=LV[Math.min(lv,LV.length-1)].maps;const i=mapIdx%mapsCount;if(lv<=1){if(i===0)return{minD:2,maxD:3,minN:0};if(i===1)return{minD:3,maxD:5,minN:8};return{minD:4,maxD:999,minN:12}}else if(lv<=4){if(i===0)return{minD:3,maxD:4,minN:10};if(i===1)return{minD:3,maxD:6,minN:15};return{minD:5,maxD:999,minN:18}}else if(lv<=7){if(i===0||i===3)return{minD:3,maxD:6,minN:12};if(i===1||i===4)return{minD:4,maxD:7,minN:18};return{minD:5,maxD:999,minN:22}}else if(lv<=10){if(i===0||i===3)return{minD:4,maxD:6,minN:14};if(i===1||i===4)return{minD:5,maxD:999,minN:20};return{minD:6,maxD:999,minN:24}}else if(lv===11){return getMapGenParams(10,i)}else if(lv===12){const baseNOI=getMapGenParams(10,i);return{minD:baseNOI.minD+2,maxD:baseNOI.maxD===999?999:Math.min(baseNOI.maxD+2,999),minN:baseNOI.minN}}else{if(i===0||i===3)return{minD:6,maxD:999,minN:28};if(i===1||i===4)return{minD:7,maxD:999,minN:32};return{minD:8,maxD:999,minN:40}}}
@@ -608,13 +867,13 @@ canvas.addEventListener('click',e=>{if(!gameStarted||saveBlocked)return;const ma
 canvas.addEventListener('mousemove',e=>{if(!gameStarted){canvas.style.cursor='default';return}const map=getActive();if(!map||map.gameOver){canvas.style.cursor='default';return}const rect=canvas.getBoundingClientRect();const hit=hitTest({x:(e.clientX-rect.left)*(LW/canvas.clientWidth),y:(e.clientY-rect.top)*(LH/canvas.clientHeight)},map);canvas.style.cursor=hit?'pointer':'default'});
 	function performInference(node,map){if(map.inferResults.has(node.id))return!1;if(isNaN(remStamina)||isNaN(remTime)){remStamina=isNaN(remStamina)?0:remStamina;remTime=isNaN(remTime)?0:remTime;refreshUI();return}const effMind=getEffMind();const baseReq=getInferenceBaseReq(node,map);if(effMind<baseReq){setGM('思维不足，无法推理(需≥'+baseReq+')','warning');return}const k=getInferenceK(level);const cost=Math.max(1,baseReq+k-effMind);if(remStamina<cost){setGM('精力不足(需'+cost+')','warning');return}remStamina-=cost;if(remTime<=0||remStamina<=0){endAllMapsDueToResourceDepletion();return}const res={containsCorrect:!1,maxScoreZero:!1,highReq:!1,hasSkillNode:!1,upgradeStocks:[]};function hasCorrect(n){if(n===map.correctResult)return!0;for(const c of n.children)if(hasCorrect(c))return!0;return!1}res.containsCorrect=hasCorrect(node);const maxSub=getMaxSub(node);res.maxScoreZero=maxSub===0;function checkHighReq(n,depth){if(depth>3)return;if(n.req-effMind>=3){res.highReq=!0;return}for(const c of n.children)checkHighReq(c,depth+1)}checkHighReq(node,0);function hasSkill(n){if(n.type==='skill')return!0;for(const c of n.children)if(hasSkill(c))return!0;return!1}res.hasSkillNode=hasSkill(node);if(shop.convenience){const foundTypes=new Set();function findUpgrades(n,depth){if(depth>5)return;if(n.upgradeType)foundTypes.add(n.upgradeType);for(const c of n.children)findUpgrades(c,depth+1)}findUpgrades(node,0);res.upgradeStocks=[...foundTypes]}map.inferResults.set(node.id,res);refreshUI()}
 document.getElementById('mapSelector').addEventListener('click',e=>{const btn=e.target.closest('.map-btn');if(!btn)return;const idx=+btn.dataset.index;if(!isNaN(idx)&&idx<maps.length){activeMapIdx=idx;if(focusStacks&&focusMapIdx!==activeMapIdx){focusStacks=0;focusMapIdx=-1}refreshUI()}});
-document.getElementById('btnModalRestart').addEventListener('click',async()=>{if(!playerName)return;if(!confirm('确定删除“'+playerName+'”的存档并完全重置吗？此操作不可撤销。'))return;try{await apiJson('/api/saves/'+encodeURIComponent(playerName),{method:'DELETE'});document.getElementById('gameOverOverlay').classList.add('hidden');playerName='';showStartScreen()}catch(error){handlePersistenceFailure(error)}});
+document.getElementById('btnModalRestart').addEventListener('click',async()=>{if(!playerName)return;if(!confirm(serviceAvailable?('确定删除“'+playerName+'”的存档并完全重置吗？此操作不可撤销。'):'确定完全重置本地进度吗？'))return;if(!serviceAvailable){document.getElementById('gameOverOverlay').classList.add('hidden');playerName='';showStartScreen();return}try{await apiJson('/api/saves/'+encodeURIComponent(playerName),{method:'DELETE'});document.getElementById('gameOverOverlay').classList.add('hidden');playerName='';showStartScreen()}catch(error){handlePersistenceFailure(error)}});
 document.getElementById('btnTutorial').addEventListener('click',()=>{window.open('tutorial.html','_blank')});
-async function refreshSaveMeta(){const input=document.getElementById('nameInput'),metaEl=document.getElementById('saveMeta'),continueBtn=document.getElementById('btnContinueGame'),newBtn=document.getElementById('btnConfirmName');const name=input.value.normalize('NFC').trim();lastSaveMeta=null;continueBtn.classList.add('hidden');metaEl.className='save-meta';if(!name){metaEl.textContent='';newBtn.textContent='新游戏';return}if(!serviceAvailable)return;const lookupName=name;try{const meta=await apiJson('/api/saves/'+encodeURIComponent(name)+'/meta');if(input.value.normalize('NFC').trim()!==lookupName)return;lastSaveMeta=meta;if(meta.exists){const when=meta.savedAt?new Date(meta.savedAt).toLocaleString():'未知时间';metaEl.textContent='发现存档：'+(meta.levelName||('第'+(meta.level+1)+'关'))+' · '+when;metaEl.classList.add('available');continueBtn.classList.remove('hidden');newBtn.textContent='覆盖存档并新游戏'}else{metaEl.textContent='没有找到同名存档';newBtn.textContent='新游戏'}}catch(error){metaEl.textContent='查询存档失败：'+error.message;metaEl.classList.add('error')}}
-function showStartScreen(){currentPhase='start';finalScreenData=null;stopChTimer();document.getElementById('nameInputOverlay').classList.remove('hidden');document.getElementById('challengeOverlay').classList.add('hidden');document.getElementById('shopOverlay').classList.add('hidden');document.getElementById('gameOverOverlay').classList.add('hidden');document.getElementById('nameInput').value=playerName||'';document.getElementById('nameError').textContent='';syncChUI();updateChallengeBtnHighlight();refreshSaveMeta();refreshSaveList()}
+async function refreshSaveMeta(){const input=document.getElementById('nameInput'),metaEl=document.getElementById('saveMeta'),continueBtn=document.getElementById('btnContinueGame'),newBtn=document.getElementById('btnConfirmName');const name=input.value.normalize('NFC').trim();lastSaveMeta=null;continueBtn.classList.add('hidden');metaEl.className='save-meta';if(!name){metaEl.textContent='';newBtn.textContent='新游戏';return}if(!serviceAvailable){continueBtn.classList.add('hidden');newBtn.textContent='新游戏';metaEl.textContent='存档服务不可用，可开始本地游玩';metaEl.classList.remove('available');metaEl.classList.add('error');return}const lookupName=name;try{const meta=await apiJson('/api/saves/'+encodeURIComponent(name)+'/meta');if(input.value.normalize('NFC').trim()!==lookupName)return;lastSaveMeta=meta;if(meta.exists){const when=meta.savedAt?new Date(meta.savedAt).toLocaleString():'未知时间';metaEl.textContent='发现存档：'+(meta.levelName||('第'+(meta.level+1)+'关'))+' · '+when;metaEl.classList.add('available');continueBtn.classList.remove('hidden');newBtn.textContent='覆盖存档并新游戏'}else{metaEl.textContent='没有找到同名存档';newBtn.textContent='新游戏'}}catch(error){metaEl.textContent='查询存档失败：'+error.message;metaEl.classList.add('error')}}
+function showStartScreen(){currentPhase='start';finalScreenData=null;stopChTimer();document.getElementById('nameInputOverlay').classList.remove('hidden');document.getElementById('challengeOverlay').classList.add('hidden');document.getElementById('shopOverlay').classList.add('hidden');document.getElementById('gameOverOverlay').classList.add('hidden');document.getElementById('manualSaveOverlay').classList.add('hidden');document.getElementById('importSaveOverlay').classList.add('hidden');document.getElementById('nameInput').value=playerName||'';document.getElementById('nameError').textContent='';syncChUI();updateChallengeBtnHighlight();updateManualSaveButton();refreshSaveMeta();refreshSaveList()}
 document.getElementById('nameInput').addEventListener('input',()=>{document.getElementById('nameError').textContent='';renderSaveList();if(nameLookupTimer)clearTimeout(nameLookupTimer);nameLookupTimer=setTimeout(refreshSaveMeta,250)});
 document.getElementById('btnRetryService').addEventListener('click',checkService);
-document.getElementById('btnConfirmName').addEventListener('click',async()=>{const name=document.getElementById('nameInput').value.normalize('NFC').trim();if(!name){document.getElementById('nameError').textContent='请输入名称';return}if(!serviceAvailable){document.getElementById('nameError').textContent='存档服务不可用';return}if(lastSaveMeta?.exists&&!confirm('同名存档将被永久覆盖，确定开始新游戏吗？'))return;try{if(lastSaveMeta?.exists)await apiJson('/api/saves/'+encodeURIComponent(name),{method:'DELETE'});playerName=name;scoreRecordedForLevel=null;saveBlocked=!1;document.getElementById('nameInputOverlay').classList.add('hidden');currentPhase='active';initGame()}catch(error){document.getElementById('nameError').textContent=error.message}});
+document.getElementById('btnConfirmName').addEventListener('click',async()=>{const name=document.getElementById('nameInput').value.normalize('NFC').trim();if(!name){document.getElementById('nameError').textContent='请输入名称';return}if(serviceAvailable&&lastSaveMeta?.exists&&!confirm('同名存档将被永久覆盖，确定开始新游戏吗？'))return;try{if(serviceAvailable&&lastSaveMeta?.exists)await apiJson('/api/saves/'+encodeURIComponent(name),{method:'DELETE'});playerName=name;scoreRecordedForLevel=null;saveBlocked=!1;document.getElementById('nameInputOverlay').classList.add('hidden');currentPhase='active';updateManualSaveButton();initGame()}catch(error){document.getElementById('nameError').textContent=error.message}});
 document.getElementById('btnContinueGame').addEventListener('click',()=>{const name=document.getElementById('nameInput').value.normalize('NFC').trim();if(name&&lastSaveMeta?.exists)continueSave(name,document.getElementById('btnContinueGame'))});
 document.getElementById('btnOpenChallenge').addEventListener('click',()=>{syncChUI();document.getElementById('challengeOverlay').classList.remove('hidden')});
 document.getElementById('btnConfirmChallenge').addEventListener('click',()=>{updateExp();syncChUI();document.getElementById('challengeOverlay').classList.add('hidden')});
@@ -763,7 +1022,16 @@ document.getElementById('btnExportLB').addEventListener('click',async()=>{
   URL.revokeObjectURL(url);
 });
 document.getElementById('btnRetrySave').addEventListener('click',retryPersistence);
-window.addEventListener('pagehide',()=>{if(!playerName||currentPhase==='start')return;try{fetch('/api/saves/'+encodeURIComponent(playerName),{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify(makeCurrentSave()),keepalive:!0})}catch{}});
+document.getElementById('btnManualSave').addEventListener('click',openManualSave);
+document.getElementById('btnCloseManualSave').addEventListener('click',()=>{document.getElementById('manualSaveOverlay').classList.add('hidden')});
+document.getElementById('btnCopyManualSave').addEventListener('click',copyManualSave);
+document.getElementById('btnCloseOfflineNotice').addEventListener('click',()=>{document.getElementById('offlineNoticeOverlay').classList.add('hidden')});
+document.getElementById('btnImportSave').addEventListener('click',openImportSaveOverlay);
+document.getElementById('btnCloseImportSave').addEventListener('click',()=>{document.getElementById('importSaveOverlay').classList.add('hidden')});
+document.getElementById('btnChooseImportFile').addEventListener('click',()=>{document.getElementById('importSaveFile').click()});
+document.getElementById('importSaveFile').addEventListener('change',event=>{const file=event.target.files&&event.target.files[0];if(file)handleImportFile(file);event.target.value=''});
+document.getElementById('btnConfirmImport').addEventListener('click',()=>importSaveFromText(document.getElementById('importSaveText').value));
+window.addEventListener('pagehide',()=>{if(!serviceAvailable||!playerName||currentPhase==='start')return;try{fetch('/api/saves/'+encodeURIComponent(playerName),{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify(makeCurrentSave()),keepalive:!0})}catch{}});
 function animLoop(){let needsRedraw=!1;const now=performance.now();for(const k in nodeAnimations){const a=nodeAnimations[k];if(a.type==='unlock'&&now-a.start<a.dur){needsRedraw=!0}else if(now-a.start>=a.dur){delete nodeAnimations[k];needsRedraw=!0}}if(needsRedraw&&getActive())drawTree(getActive());if(Object.keys(nodeAnimations).length>0)requestAnimationFrame(animLoop)}setInterval(()=>{if(Object.keys(nodeAnimations).length>0){animLoop()}},50);
 updateSidePanel();updateSideStocks();initShopPanel();updateActBar();updateFocusBtnDisplay();updateShopPreview();updateChallengeBtnHighlight();showStartScreen();checkService();
 })();
