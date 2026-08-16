@@ -1,0 +1,4 @@
+data/leaderboard.json
+data/saves/*.json
+data/**/*.tmp
+
